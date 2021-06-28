@@ -22,12 +22,16 @@ Processor& System::Cpu() {
 }
 
 // TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+vector<Process>& System::Processes() {
+    processes_.clear();
+    for(auto p :LinuxParser::Pids()){
+        processes_.emplace_back(p);
+    }
+    return processes_;
+}
 
-// TODO: Return the system's kernel identifier (string)
 std::string System::Kernel() { return LinuxParser::Kernel(); }
 
-// TODO: Return the system's memory utilization
 float System::MemoryUtilization() {
     auto mem = LinuxParser::MemoryUtilization();
     return mem;
@@ -35,12 +39,9 @@ float System::MemoryUtilization() {
 
 std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
-// TODO: Return the number of processes actively running on the system
-int System::RunningProcesses() { return 0; }
+int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
 
-// TODO: Return the total number of processes on the system
-int System::TotalProcesses() { return 0; }
-
+int System::TotalProcesses() { return LinuxParser::TotalProcesses();}
 
 long int System::UpTime() {
   auto time =  LinuxParser::UpTime();
