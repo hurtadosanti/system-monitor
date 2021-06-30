@@ -109,9 +109,25 @@ long LinuxParser::UpTime() {
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
 
-// TODO: Read and return the number of active jiffies for a PID
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+//Read and return the number of active jiffies for a PID
+long LinuxParser::ActiveJiffies(int pid) {
+    string line;
+    string key,value;
+    std::ifstream stream(kProcDirectory +std::to_string(pid)+kStatFilename);
+    long total=0;
+    if (stream.is_open()) {
+        std::getline(stream, line);
+        std::istringstream line_stream(line);
+        long val=0;
+        for (int n = 0; n < 17; n++) {
+            line_stream >> val;
+            if(n>12){
+                total+=val;
+            }
+        }
+    }
+    return total;
+}
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() { return 0; }
@@ -120,16 +136,16 @@ long LinuxParser::ActiveJiffies() { return 0; }
 long LinuxParser::IdleJiffies() { return 0; }
 
 //user,nice,system,idle,iowait,irq,sirq,steal,guest,guest_nice;
-vector<int> LinuxParser::CpuUtilization() {
+vector<float> LinuxParser::CpuUtilization() {
     string line, key;
-    vector<int> cpu_data;
+    vector<float> cpu_data;
     std::ifstream stream(kProcDirectory + kStatFilename);
     if (stream.is_open()) {
         std::getline(stream, line);
         std::istringstream line_stream(line);
         line_stream >> key;
         for (int n = 0; n < 10; n++) {
-            int val;
+            float val;
             line_stream >> val;
             cpu_data.push_back(val);
         }
